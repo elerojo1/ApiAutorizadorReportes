@@ -28,8 +28,6 @@ namespace ApiAutorizadorReportes.Models
 
         // Relación con el Usuario que crea el reporte
         public int IdUsuario { get; set; }
-        [ForeignKey("IdUsuario")]
-        public Usuario Usuario { get; set; }
 
         // Este campo es opcional (null) hasta que alguien lo autorice
         public DateTime? FechaAutorización
