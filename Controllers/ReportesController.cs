@@ -17,8 +17,21 @@ namespace ApiAutorizadorReportes.Controllers
 
         // POST: api/Reportes
         [HttpPost("Guardar")]
-        public async Task<ActionResult<Reporte>> PostReporte(Reporte reporte)
+        public async Task<ActionResult> PostReporte([FromForm] string titulo, [FromForm] string descripcion, [FromForm] int idUsuario, IFormFile archivoImagen)
         {
+            Reporte reporte = new Reporte
+            {
+                Titulo = titulo,
+                Descripcion = descripcion,
+                IdUsuario = idUsuario,
+                FechaRegistro = DateTime.UtcNow,
+                Estatus = "Pendiente"
+            };
+            reporte.Imagen = new Imagen
+            {
+                Nombre = archivoImagen.FileName,
+                Ruta = "wwwroot/uploads"
+            };
             _appDbContext.Reportes.Add(reporte);
             await _appDbContext.SaveChangesAsync();
             return Ok(reporte);

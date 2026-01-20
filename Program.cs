@@ -3,6 +3,18 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- CORS ---
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+// --------------------
+
 // --- Swagger ---
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer(); // Necesario para encontrar los endpoints
@@ -15,8 +27,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Add services to the container.
 
 var app = builder.Build();
+// --- CORS ---
+app.UseCors(); // Asegúrate de que esté antes de UseAuthorization
 
-// --- AGREGAR ESTO ---
+// --- Swagger ---
 if (app.Environment.IsDevelopment()) // Solo se muestra en desarrollo
 {
     app.UseSwagger();
