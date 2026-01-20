@@ -27,11 +27,35 @@ namespace ApiAutorizadorReportes.Controllers
                 FechaRegistro = DateTime.UtcNow,
                 Estatus = "Pendiente"
             };
+
+            if (archivoImagen == null || archivoImagen.Length == 0)
+            {
+                return BadRequest("No se subió ningún archivo de imagen.");
+            }
+
+            var folderName = Path.Combine("wwwroot", "uploads");
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+            if (!Directory.Exists(pathToSave))
+            {
+                Directory.CreateDirectory(pathToSave);
+            }
+
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(archivoImagen.FileName);
+            var fullPath = Path.Combine(pathToSave, fileName);
+
+            using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                await archivoImagen.CopyToAsync(stream);
+            }
+
+            string urlImagen = $"/uploads/{fileName}";
             reporte.Imagen = new Imagen
             {
-                Nombre = archivoImagen.FileName,
-                Ruta = "wwwroot/uploads"
+                Nombre = fileName,
+                Ruta = urlImagen // Esto es lo que Flutter usará: "http://tu-api.com/uploads/nombre.jpg"
             };
+
             _appDbContext.Reportes.Add(reporte);
             await _appDbContext.SaveChangesAsync();
             return Ok(reporte);
@@ -67,7 +91,7 @@ namespace ApiAutorizadorReportes.Controllers
         }
 
         [HttpPatch("ActualizarEstatus/{id}")]
-        public async Task<IActionResult> ActualizarEstatus(int id, [FromBody] string nuevoEstatus)
+        public async Task<IActionResult> ActualizarEstatus(int id, [FromBody] ActualizarEstatusDto dto)
         {
             var reporte = await _appDbContext.Reportes.FindAsync(id);
             if (reporte == null)
@@ -75,7 +99,8 @@ namespace ApiAutorizadorReportes.Controllers
                 return NotFound(new { mensaje = "Reporte no encontrado" });
             }
 
-            reporte.Estatus = nuevoEstatus;
+            reporte.Estatus = dto.NuevoEstatus;
+            reporte.NombreCompleto = dto.NombreCompleto;
             reporte.FechaAutorización = DateTime.UtcNow;
             await _appDbContext.SaveChangesAsync();
 

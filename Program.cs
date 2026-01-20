@@ -45,6 +45,7 @@ if (app.Environment.IsDevelopment()) // Solo se muestra en desarrollo
 
 // Configure the HTTP request pipeline.
 
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

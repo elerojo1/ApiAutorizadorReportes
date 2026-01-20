@@ -28,6 +28,7 @@ namespace ApiAutorizadorReportes.Models
 
         // Relación con el Usuario que crea el reporte
         public int IdUsuario { get; set; }
+        public string? NombreCompleto { get; set; } = null;
 
         // Este campo es opcional (null) hasta que alguien lo autorice
         public DateTime? FechaAutorización
